@@ -13,6 +13,7 @@ namespace miRNA_corpus
         {
             int counter = 0;
             string line;
+
             string[] txt = new string[1000000];
             string[,] abstext = new string[100000, 3];
 
