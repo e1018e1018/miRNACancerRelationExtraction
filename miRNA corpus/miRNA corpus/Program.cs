@@ -20,7 +20,7 @@ namespace miRNA_corpus
             string[] txt = new string[1000000];
             string[,] abstext = new string[100000, 6];
 
-            string[] word = new string[30];
+            List<string> word = new List<string>();
             string[,] result = new string[10000, 3];
 
             System.IO.StreamReader file = new System.IO.StreamReader(@"TrainingSet.txt");
@@ -43,36 +43,35 @@ namespace miRNA_corpus
             {
                 if (abstext[i, 0] != temp)
                 {
-                    int j = 0;
                     foreach (string s in Regex.Split(abstext[i, 1], @" "))
                     {
-                        word[j] = s;
-                        j++;
+                        word.Add(s);
                     }
-                    for (int x = 0; x < j; j++)
+                    for (int x = 0; x < word.Count; x++)
                     {
-                        if (word[j] == "miR-" + "%d")
+                        Match m = Regex.Match(word[x], @"\b(?'MIRNA'[Mm]i[Rr]-*\d+[a-z]?\d*\*?)\b");
+                        if (m.Success)
+                        {
+                            result[num, 0] = abstext[i, 0];
+                            result[num, 1] = m.Groups["MIRNA"].Value;
+                            result[num, 2] = abstext[i, 4];
+                            num++;
+                        }
+                        else if (word[x] == "microRNA-" + "%d")
                         {
                             result[num, 0] = abstext[i, 0];
                             result[num, 1] = word[x];
                             result[num, 2] = abstext[i, 4];
                             num++;
                         }
-                        else if (word[j] == "microRNA-" + "%d")
+                        else if (word[x] == "miRNA-" + "%d")
                         {
                             result[num, 0] = abstext[i, 0];
                             result[num, 1] = word[x];
                             result[num, 2] = abstext[i, 4];
                             num++;
                         }
-                        else if (word[j] == "miRNA-" + "%d")
-                        {
-                            result[num, 0] = abstext[i, 0];
-                            result[num, 1] = word[x];
-                            result[num, 2] = abstext[i, 4];
-                            num++;
-                        }
-                        else if (word[j] == "let-" + "%d")
+                        else if (word[x] == "let-" + "%d")
                         {
                             result[num, 0] = abstext[i, 0];
                             result[num, 1] = word[x];
