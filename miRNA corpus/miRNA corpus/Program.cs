@@ -51,7 +51,7 @@ namespace miRNA_corpus
                     }
                     for (int x = 0; x < j; j++)
                     {
-                        if (word[j] == "miR-" + @"%d")
+                        if (word[j] == "miR-" + "%d")
                         {
                             result[num, 0] = abstext[i, 0];
                             result[num, 1] = word[x];
