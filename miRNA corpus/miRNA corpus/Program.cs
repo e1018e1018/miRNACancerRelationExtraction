@@ -18,10 +18,19 @@ namespace miRNA_corpus
             string line;
             string temp = "a";
             string[] txt = new string[1000000];
-            string[,] abstext = new string[100000, 6];
+            string[,] abstext = new string[1000000, 6];
+            /*int a = 0;
+            int b = 0;
+            int TP = 0;
+            int FP = 0;
+            int TN = 0;
+            int FN = 0;
+            int ACC = 0;
+            int PRE = 0;
+            int REC = 0;*/
 
-            string[] word = new string[30];
-            string[,] result = new string[10000, 3];
+            List<string> word = new List<string>();
+            string[,] result = new string[1000000, 2];
 
             System.IO.StreamReader file = new System.IO.StreamReader(@"TrainingSet.txt");
             while ((line = file.ReadLine()) != null)
@@ -39,51 +48,100 @@ namespace miRNA_corpus
                 abstext[counter, 1] = genia.Tokenize(txt[counter]);*/
                 counter++;
             }
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < counter; i++)
             {
                 if (abstext[i, 0] != temp)
                 {
-                    int j = 0;
-                    foreach (string s in Regex.Split(abstext[i, 1], @" "))
+                    foreach (string s in Regex.Split(abstext[i, 1], @", "))
                     {
-                        word[j] = s;
-                        j++;
+                        word.Add(s);
                     }
-                    for (int x = 0; x < j; j++)
+                    for (int x = 0; x < word.Count; x++)
                     {
-                        if (word[j] == "miR-" + "%d")
+                        Match m = Regex.Match("anti-miR-22", @"\b(?'MIR'[Mm]i[Rr]-*\d+[a-z]*/*\d*\*{0,1})");                                      
+                        if (m.Success)
                         {
-                            result[num, 0] = abstext[i, 0];
-                            result[num, 1] = word[x];
-                            result[num, 2] = abstext[i, 4];
+                            //result[num, 0] = abstext[i, 0];
+                            result[num, 1] = m.Groups["MIR"].Value;
+                            Console.WriteLine(result[num, 1]);
+                            //result[num, 2] = abstext[i, 4];
                             num++;
+                            /*for(a = 0; a < i; a++)
+                            {
+                                if (result[num, 1] == abstext[a, 4])
+                                {
+                                    TP++;
+                                }
+                                else
+                                {
+                                    FN++; 
+                                }
+                            }  */                        
                         }
-                        else if (word[j] == "microRNA-" + "%d")
+                        Match n = Regex.Match(word[x], @"\b(?'MIRNA'[Mm]iRNA-*\d+[a-z]?\d*\*?)");
+                        if (n.Success)
                         {
                             result[num, 0] = abstext[i, 0];
-                            result[num, 1] = word[x];
-                            result[num, 2] = abstext[i, 4];
+                            result[num, 1] = n.Groups["MIRNA"].Value;
+                            //result[num, 2] = abstext[i, 4];
                             num++;
+                            /*for (a = 0; a < i; a++)
+                            {
+                                if (result[num, 1] == abstext[a, 4])
+                                {
+                                    TP++;
+                                }
+                                else
+                                {
+                                    FN++;
+                                }
+                            }*/
                         }
-                        else if (word[j] == "miRNA-" + "%d")
+                        /*else if (word[x] == "miRNA-" + "%d")
                         {
                             result[num, 0] = abstext[i, 0];
                             result[num, 1] = word[x];
                             result[num, 2] = abstext[i, 4];
                             num++;
-                        }
-                        else if (word[j] == "let-" + "%d")
-                        {
-                            result[num, 0] = abstext[i, 0];
-                            result[num, 1] = word[x];
-                            result[num, 2] = abstext[i, 4];
-                            num++;
+                        }*/
+                        Match o = Regex.Match(word[x], @"\b(?'LET'[Ll][Ee][Tt]-*\d+[a-z]?\d*\*?)");
+                        if (o.Success)
+                         {
+                             result[num, 0] = abstext[i, 0];
+                             result[num, 1] =o.Groups["LET"].Value;
+                             //result[num, 2] = abstext[i, 4];
+                             num++;
+                            
                         }
                     }
                 }
                 temp = abstext[i, 0];
             }
-            
+            for (int c = 0; c < num; c++)
+            {
+                Console.WriteLine(result[c, 1]);
+            }
+            Console.WriteLine("num:" + num);
+            /*for (a = 0; a < num; a++)
+            {
+                for (b = 0; b < counter; b++)
+                {
+                    if (result[a, 1] == abstext[b, 4])
+                    {
+                        TP++;
+                    }
+                    else
+                    {
+                        FN++;
+                    }
+                }
+            }
+            ACC = (TP + TN) / num;
+            PRE = TP / (TP + FP);
+            REC = TP / (TP + FN);
+            Console.WriteLine("Accuracy:" + ACC);
+            Console.WriteLine("Precision:" + PRE);
+            Console.WriteLine("Recall:" + REC);*/
 
             file.Close();
             Console.ReadLine();

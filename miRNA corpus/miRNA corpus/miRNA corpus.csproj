@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>miRNA_corpus.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="biotext, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\BioText.0.3.12.3\lib\biotext.dll</HintPath>
