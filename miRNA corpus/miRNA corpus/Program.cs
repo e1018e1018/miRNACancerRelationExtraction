@@ -1,152 +1,130 @@
-﻿using IASL.BioTextMining.ThirdParty.TsujiiLab;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using IASL.BioTextMining.Cores.Text.Annotation;
+using IASL.BioTextMining.Cores.Text.Articles;
+using IASL.BioTextMining.Cores.Text.Articles.Abstracts;
+using IASL.BioTextMining.NamedEntityIdentification.BioCreAtIvE;
+using IASL.BioTextMining.NamedEntityIdentification.BioCreAtIvE.Normalization.BCII;
+using IASL.BioTextMining.ThirdParty.TsujiiLab;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace miRNA_corpus
+namespace GeneNameTaggerTest
 {
     class Program
     {
+        
         static void Main(string[] args)
         {
-            int counter = 0;
-            int count = 0;
-            int num = 0;
-            string line;
-            string temp = "a";
-            string[] txt = new string[1000000];
-            string[,] abstext = new string[1000000, 6];
-            /*int a = 0;
-            int b = 0;
-            int TP = 0;
-            int FP = 0;
-            int TN = 0;
-            int FN = 0;
-            int ACC = 0;
-            int PRE = 0;
-            int REC = 0;*/
+            
+            List<string> sents=new List<string>();
+            
+            string sent = "OBJECTIVE: To construct and screen an effective anti-miR-221, miRNA-120 vector of siRNA.";
+            Console.WriteLine(sent);
+            int a=miRNARecognition(sent);
+            Console.WriteLine(a);
+            sent = "aaaaa ablation impairs liver regeneration in an estrogen-dependent manner.";
+            Console.WriteLine(sent);
+            a = miRNARecognition(sent);
+            Console.WriteLine(a);
+            /*BCIIGeneNameTagger _tagger;
+            _tagger = BCIIGeneNameTagger.GetInstance(GENIATagger.GetInstance(@"D:\Resources\IASL\Models\ThirdParty\TsujiiLab\GENIATagger\"),@"D:\Resources\IASL\Models\BioCreAtIvE\BCII\GM\BCII.model");
+            Abstract article = null;
+            Abstract expected = null;
+            article = new Abstract("21329655");
+            Sentence sent = new Sentence("PPARγ ligands induce growth inhibition and apoptosis through p63 and p73 in human ovarian cancer cells.", article);
+            article.SentencesOfTitle.Add(sent);
+            sent = new Sentence("Peroxisome proliferator-activated receptor gamma (PPARγ) agonists, including thiazolidinediones (TZDs), can induce anti-proliferation, differentiation, and apoptosis in various cancer cell types. This study investigated the mechanism of the anticancer effect of TZDs on human ovarian cancer.", article);
+            article.SentencesOfAbstract.Add(sent);
+            sent = new Sentence("Six human ovarian cancer cell lines (NIH:OVCAR3, SKOV3, SNU-251, SNU-8, SNU-840, and 2774) were treated with the TZD, which induced dose-dependent inhibition of cell growth.", article);
+            article.SentencesOfAbstract.Add(sent);
+            _tagger.Tag(article);
+            expected = new Abstract("21329655");
+            sent = new Sentence("PPARγ ligands induce growth inhibition and apoptosis through p63 and p73 in human ovarian cancer cells.", expected);
+            sent.Entities.Add(new BCIIAnnotationInfo(0, 5, BCIIGeneNameTagger.ANNOTATION, "PPARγ"));
+            sent.Entities.Add(new BCIIAnnotationInfo(53, 56, BCIIGeneNameTagger.ANNOTATION, "p63"));
+            sent.Entities.Add(new BCIIAnnotationInfo(59, 62, BCIIGeneNameTagger.ANNOTATION, "p73"));
+            expected.SentencesOfTitle.Add(sent);
+            sent = new Sentence("Peroxisome proliferator-activated receptor gamma (PPARγ) agonists, including thiazolidinediones (TZDs), can induce anti-proliferation, differentiation, and apoptosis in various cancer cell types. This study investigated the mechanism of the anticancer effect of TZDs on human ovarian cancer.", expected);
+            sent.Entities.Add(new BCIIAnnotationInfo(0, 45, BCIIGeneNameTagger.ANNOTATION, "Peroxisome proliferator-activated receptor gamma"));
+            sent.Entities.Add(new BCIIAnnotationInfo(46, 51, BCIIGeneNameTagger.ANNOTATION, "PPARγ"));
+            expected.SentencesOfAbstract.Add(sent);
+            sent = new Sentence("Six human ovarian cancer cell lines (NIH:OVCAR3, SKOV3, SNU-251, SNU-8, SNU-840, and 2774) were treated with the TZD, which induced dose-dependent inhibition of cell growth.", expected);
+            sent.Entities.Add(new BCIIAnnotationInfo(42, 47, BCIIGeneNameTagger.ANNOTATION, "SKOV3"));
+            //sent.Entities.Add(new IASL.BioTextMining.Cores.Text.Annotation.AnnotationInfo(48, 55, BCIIGeneNameTagger.ANNOTATION, "SNU-251"));
+            sent.Entities.Add(new BCIIAnnotationInfo(56, 61, BCIIGeneNameTagger.ANNOTATION, "SNU-8"));
+            expected.SentencesOfAbstract.Add(sent);
 
-            List<string> word = new List<string>();
-            string[,] result = new string[1000000, 2];
-
-            System.IO.StreamReader file = new System.IO.StreamReader(@"TrainingSet.txt");
-            while ((line = file.ReadLine()) != null)
+            for (int j = 0; j < expected.SentencesOfTitle.Count; j++)
             {
-                /*Console.WriteLine(line);*/
-                count = 0;
-                txt[counter] = line;
-                foreach (string s in Regex.Split(line, @"\t"))
+                Sentence exp_sent = expected.SentencesOfTitle[j];
+                for (int i = 0; i < exp_sent.Entities.Count; i++)
                 {
-                    //Console.Write(s);
-                    abstext[counter, count] = s;
-                    count++;
+                    Assert.AreEqual(exp_sent.Entities[i], article.SentencesOfTitle[j].Entities[i], "IASL.BioTextMining.NamedEntityIdentification.BioCreAtIvE.BCIIGeneNameTagger.Tag 未傳回預期的值。");
                 }
-                /*GENIATagger genia = GENIATagger.GetInstance(@"D:\文件\學校\研究所\畢業\microRNA\GENIATagger");
-                abstext[counter, 1] = genia.Tokenize(txt[counter]);*/
-                counter++;
             }
-            for (int i = 0; i < counter; i++)
+
+            for (int j = 0; j < expected.SentencesOfAbstract.Count; j++)
             {
-                if (abstext[i, 0] != temp)
+                Sentence exp_sent = expected.SentencesOfAbstract[j];
+                for (int i = 0; i < exp_sent.Entities.Count; i++)
                 {
-                    foreach (string s in Regex.Split(abstext[i, 1], @", "))
+                    Assert.AreEqual(exp_sent.Entities[i], article.SentencesOfAbstract[j].Entities[i], "IASL.BioTextMining.NamedEntityIdentification.BioCreAtIvE.BCIIGeneNameTagger.Tag 未傳回預期的值。");
+                }
+            }*/
+        }
+
+        private static int miRNARecognition(string sent)
+        {
+            int flag = 0;
+            List<string> words = new List<string>();
+            List<string> Extractedwords = new List<string>();
+            foreach (string s in Regex.Split(sent, @", "))
+            {
+                words.Add(s);
+            }
+            foreach (string word in words)
+            {
+                Match m = Regex.Match(word, @"\b(?'MIR'[Mm]i[Rr]-*\d+[a-z]*/*\d*\*{0,1})");
+                Match n = Regex.Match(word, @"\b(?'MIRNA'[Mm]iRNA-*\d+[a-z]?/*\d*\*?)");
+                Match o = Regex.Match(word, @"\b(?'LET'[Ll][Ee][Tt]-*\d+[a-z]?\d*\*?)");
+                Match aa = Regex.Match(word, @"\b(?'ANTI'[Aa][Nn][Tt][Ii]-)");
+
+                if (aa.Success)
+                {
+                    continue;
+                }
+                else
+                {
+                    if (m.Success || n.Success || o.Success)
                     {
-                        word.Add(s);
-                    }
-                    for (int x = 0; x < word.Count; x++)
-                    {
-                        Match m = Regex.Match("anti-miR-22", @"\b(?'MIR'[Mm]i[Rr]-*\d+[a-z]*/*\d*\*{0,1})");                                      
+
                         if (m.Success)
                         {
-                            //result[num, 0] = abstext[i, 0];
-                            result[num, 1] = m.Groups["MIR"].Value;
-                            Console.WriteLine(result[num, 1]);
-                            //result[num, 2] = abstext[i, 4];
-                            num++;
-                            /*for(a = 0; a < i; a++)
-                            {
-                                if (result[num, 1] == abstext[a, 4])
-                                {
-                                    TP++;
-                                }
-                                else
-                                {
-                                    FN++; 
-                                }
-                            }  */                        
+                            Extractedwords.Add(m.Groups["MIR"].Value);
                         }
-                        Match n = Regex.Match(word[x], @"\b(?'MIRNA'[Mm]iRNA-*\d+[a-z]?\d*\*?)");
                         if (n.Success)
                         {
-                            result[num, 0] = abstext[i, 0];
-                            result[num, 1] = n.Groups["MIRNA"].Value;
-                            //result[num, 2] = abstext[i, 4];
-                            num++;
-                            /*for (a = 0; a < i; a++)
-                            {
-                                if (result[num, 1] == abstext[a, 4])
-                                {
-                                    TP++;
-                                }
-                                else
-                                {
-                                    FN++;
-                                }
-                            }*/
+                            Extractedwords.Add(n.Groups["MIRNA"].Value);
                         }
-                        /*else if (word[x] == "miRNA-" + "%d")
-                        {
-                            result[num, 0] = abstext[i, 0];
-                            result[num, 1] = word[x];
-                            result[num, 2] = abstext[i, 4];
-                            num++;
-                        }*/
-                        Match o = Regex.Match(word[x], @"\b(?'LET'[Ll][Ee][Tt]-*\d+[a-z]?\d*\*?)");
                         if (o.Success)
-                         {
-                             result[num, 0] = abstext[i, 0];
-                             result[num, 1] =o.Groups["LET"].Value;
-                             //result[num, 2] = abstext[i, 4];
-                             num++;
-                            
+                        {
+                            Extractedwords.Add(o.Groups["LET"].Value);
                         }
-                    }
-                }
-                temp = abstext[i, 0];
-            }
-            for (int c = 0; c < num; c++)
-            {
-                Console.WriteLine(result[c, 1]);
-            }
-            Console.WriteLine("num:" + num);
-            /*for (a = 0; a < num; a++)
-            {
-                for (b = 0; b < counter; b++)
-                {
-                    if (result[a, 1] == abstext[b, 4])
-                    {
-                        TP++;
+                        flag = 1;
                     }
                     else
                     {
-                        FN++;
+                        flag = 0;
                     }
-                }
+                }     
             }
-            ACC = (TP + TN) / num;
-            PRE = TP / (TP + FP);
-            REC = TP / (TP + FN);
-            Console.WriteLine("Accuracy:" + ACC);
-            Console.WriteLine("Precision:" + PRE);
-            Console.WriteLine("Recall:" + REC);*/
-
-            file.Close();
-            Console.ReadLine();
-
-
+            foreach (string Extracted in Extractedwords)
+            {
+                Console.WriteLine(Extracted);
+            }
+            return flag;
         }
     }
 }
