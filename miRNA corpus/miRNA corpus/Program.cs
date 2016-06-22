@@ -14,18 +14,26 @@ namespace miRNA_corpus
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
             
             List<string> sents=new List<string>();
             string line;
+            string pubmedid;
+            int count = 0;
 
             System.IO.StreamReader file = new System.IO.StreamReader(@"26807169.txt");
             while ((line = file.ReadLine()) != null)
             {
 
                 string sent = line;
+
+                if (count == 0)
+                {
+                    pubmedid = sent;
+                    Console.WriteLine(pubmedid);
+                }
                 
                 string a = miRNARecognition(sent);
                 if (a != null)
@@ -37,6 +45,7 @@ namespace miRNA_corpus
                         Console.WriteLine(a + " " + b);
                     }
                 }
+                count++;
                 
                 /*sent = "aaaaa ablation impairs liver regeneration in an estrogen-dependent manner.";
                 Console.WriteLine(sent);
