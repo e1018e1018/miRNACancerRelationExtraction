@@ -42,8 +42,20 @@
       <HintPath>..\packages\BioText.0.3.12.3\lib\biotext.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="IASL.BioTextMining.Cores, Version=2.0.2.5, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\IASL-BioTextMining.Cores.2.0.2.5\lib\net40\IASL.BioTextMining.Cores.dll</HintPath>
+    <Reference Include="crfpp_clr, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\IASL-BioTextMining.MachineLearning.2.0.1.5\lib\net40\crfpp_clr.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="IASL.BioTextMining.Cores, Version=2.0.3.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\IASL-BioTextMining.Cores.2.0.3.0\lib\net40\IASL.BioTextMining.Cores.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="IASL.BioTextMining.MachineLearning, Version=2.0.1.5, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\IASL-BioTextMining.MachineLearning.2.0.1.5\lib\net40\IASL.BioTextMining.MachineLearning.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="IASL.BioTextMining.NamedEntityIdentification, Version=2.0.4.2, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\IASL-BioTextMining.NamedEntityRecognition.2.0.4.2\lib\net40\IASL.BioTextMining.NamedEntityIdentification.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="IASL.BioTextMining.ThirdParty, Version=1.0.0.7, Culture=neutral, processorArchitecture=x86">
