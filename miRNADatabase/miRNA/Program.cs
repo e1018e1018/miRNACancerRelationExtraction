@@ -16,14 +16,14 @@ namespace miRNA
     {
         static void Main(string[] args)
         {
-            using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-UK96O0N;Initial Catalog=miRNA_final;Integrated Security=True"))
+            using (SqlConnection con = new SqlConnection("Data Source=localhost;Initial Catalog=miRNA_final;Integrated Security=True"))
             {
                 //
                 // Open the SqlConnection.
                 //
                 con.Open();
                 XmlDocument miRNA = new XmlDocument();
-                miRNA.Load(@"C:\Users\e1018\Desktop\專題\miRNA-Test-Corpus.xml");
+                miRNA.Load(@"..\..\..\Dataset\miRNA-Test-Corpus.xml");
                 //for (int i = 0; i < doc.SelectNodes("corpus//document").Count; i++)
                 //{
                 //    XmlNode mode = doc.SelectNodes("corpus//document")[i];
@@ -36,7 +36,8 @@ namespace miRNA
                     //
                     // The following code uses an SqlCommand based on the SqlConnection.
                     //
-                    SqlCommand d_command_0 = new SqlCommand("INSERT INTO ARTICLE (ART_PMID, ART_JOURNAL,ART_ISSN) VALUES ('" + pmid + "','" + a.JournalName.Replace("'", "''") + "','" + a.ISSN + "')", con);
+                    SqlCommand d_command_0 = new SqlCommand("INSERT INTO ARTICLE (ART_PMID) VALUES ('" + pmid + "')", con);
+                    //SqlCommand d_command_0 = new SqlCommand("INSERT INTO ARTICLE (ART_PMID, ART_JOURNAL,ART_ISSN) VALUES ('" + pmid + "','" + a.JournalName.Replace("'", "''") + "','" + a.ISSN + "')", con);
                     //SqlCommand d_command_1 = new SqlCommand("INSERT INTO ARTICLE (ART_JOURNAL) VALUES ('" + + "')", con);
                     //SqlCommand d_command_2 = new SqlCommand("INSERT INTO ARTICLE (ART_ISSN) VALUES ('" + pmid + "')", con);
                     d_command_0.ExecuteNonQuery();
@@ -74,7 +75,7 @@ namespace miRNA
                             string e_type = entity.Attributes["type"].Value;
                             string charOffset = entity.Attributes["charOffset"].Value;
                             string[] sArray = charOffset.Split('-');
-                            SqlCommand e_command = new SqlCommand("INSERT INTO ENTITY (ANN_ID,TEXT,FIRST_LETTER_NUM,LAST_LETTER_NUM) VALUES ('" + ann_fk + "','" + entext + "','" + sArray[0] + "','" + sArray[1] + "')", con);
+                            //SqlCommand e_command = new SqlCommand("INSERT INTO ENTITY (ANN_ID,TEXT,FIRST_LETTER_NUM,LAST_LETTER_NUM) VALUES ('" + ann_fk + "','" + entext + "','" + sArray[0] + "','" + sArray[1] + "')", con);
                             DataTable annTable = new DataTable();
                             annTable.Columns.Add("SENT_ID", typeof(int));
                             annTable.Columns.Add("ART_ID", typeof(int));
