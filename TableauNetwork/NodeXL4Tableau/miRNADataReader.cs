@@ -1,4 +1,5 @@
 ﻿using Microsoft.NodeXL.ExcelTemplatePlugIns;
+using Smrf.NodeXL.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,6 +48,68 @@ namespace NodeXL4Tableau
                             {
                                 edges.Add(e);
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        public IGraph GetGraph()
+        {
+            return graph;
+        }
+        private IGraph graph;
+        private Dictionary<string, Vertex> vertexes;
+        public MiRNADataReader(string sourcefile)
+        {
+            // Create a graph with mixed directedness.
+            graph = new Graph();
+            vertexes = new Dictionary<string, Vertex>();
+            // Add vertices to the graph. 
+            IVertexCollection oVertices = graph.Vertices;
+            IEdgeCollection oEdges = graph.Edges;
+            using (StreamReader sr = new StreamReader(sourcefile))
+            {
+                while (sr.Peek() != -1)
+                {
+                    string line = sr.ReadLine().Trim();
+                    if (line.Equals(""))
+                    {
+                        continue;
+                    }
+                    string[] tks = line.Split('\t');
+                    string[] miRNAs = tks[2].Split('|');
+                    string[] diseases = tks[5].Split('|');
+                    for (int i = 0; i < miRNAs.Length; i++)
+                    {
+                        Vertex s = new Vertex();
+                        s.Name = miRNAs[i];
+                        if (!vertexes.ContainsKey(s.Name))
+                        {
+                            vertexes.Add(s.Name, s);
+                            oVertices.Add(s);
+                        }
+                        else
+                        {
+                            s = vertexes[s.Name];                            
+                        }
+                        
+                        for (int j = 0; j < diseases.Length; j++)
+                        {
+                            Vertex t = new Vertex();
+                            t.Name = diseases[j];
+                            if (!vertexes.ContainsKey(t.Name))
+                            {
+                                vertexes.Add(t.Name, t);
+                                oVertices.Add(t);
+                            }
+                            else
+                            {
+                                t = vertexes[t.Name];                                
+                            }
+                            Smrf.NodeXL.Core.Edge e = new Smrf.NodeXL.Core.Edge(s, t, false);
+                            e.Name = tks[4];
+                            oEdges.Add(e);
                         }
                     }
                 }

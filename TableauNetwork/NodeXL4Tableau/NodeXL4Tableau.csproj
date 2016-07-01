@@ -37,11 +37,17 @@
     <Reference Include="Microsoft.NodeXL.ExcelTemplatePlugIns">
       <HintPath>..\Libs\Microsoft.NodeXL.ExcelTemplatePlugIns.dll</HintPath>
     </Reference>
+    <Reference Include="Smrf.NodeXL.Core">
+      <HintPath>..\Libs\Smrf.NodeXL.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Smrf.NodeXL.Layouts">
+      <HintPath>..\Libs\Smrf.NodeXL.Layouts.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
