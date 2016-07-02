@@ -20,12 +20,14 @@ namespace NodeXL4Tableau
             cl.LayOutGraph(g, lc);
             using (StreamWriter sw = new StreamWriter("tableau.txt"))
             {
+                sw.Write("ID\tRelation\tRelType\tNE\tX\tY\tY'\tNEType\n");
+                    
                 foreach (var edge in g.Edges)
                 {
-                    sw.Write("{0}\t{1}\t{2}\t{3}\t{3}\n", edge.ID, edge.Vertex1.Name, 
-                        edge.Vertex1.Location.X, edge.Vertex1.Location.Y);
-                    sw.Write("{0}\t{1}\t{2}\t{3}\t{3}\n", edge.ID, edge.Vertex2.Name,
-                        edge.Vertex2.Location.X, edge.Vertex2.Location.Y);                    
+                    sw.Write("{0}\t{4}\t{5}\t{1}\t{2}\t{3}\t{3}\tmiRNA\n", edge.ID, edge.Vertex1.Name, 
+                        edge.Vertex1.Location.X, edge.Vertex1.Location.Y, edge.Name, edge.Tag);
+                    sw.Write("{0}\t{4}\t{5}\t{1}\t{2}\t{3}\t{3}\tCancer\n", edge.ID, edge.Vertex2.Name,
+                        edge.Vertex2.Location.X, edge.Vertex2.Location.Y, edge.Name, edge.Tag);                    
                 }
             }
         }

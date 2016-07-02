@@ -79,11 +79,11 @@ namespace NodeXL4Tableau
                     }
                     string[] tks = line.Split('\t');
                     string[] miRNAs = tks[2].Split('|');
-                    string[] diseases = tks[5].Split('|');
+                    string[] diseases = tks[6].Split('|');
                     for (int i = 0; i < miRNAs.Length; i++)
                     {
                         Vertex s = new Vertex();
-                        s.Name = miRNAs[i];
+                        s.Name = miRNAs[i].ToLower();
                         if (!vertexes.ContainsKey(s.Name))
                         {
                             vertexes.Add(s.Name, s);
@@ -97,7 +97,7 @@ namespace NodeXL4Tableau
                         for (int j = 0; j < diseases.Length; j++)
                         {
                             Vertex t = new Vertex();
-                            t.Name = diseases[j];
+                            t.Name = diseases[j].ToLower();
                             if (!vertexes.ContainsKey(t.Name))
                             {
                                 vertexes.Add(t.Name, t);
@@ -108,8 +108,9 @@ namespace NodeXL4Tableau
                                 t = vertexes[t.Name];                                
                             }
                             Smrf.NodeXL.Core.Edge e = new Smrf.NodeXL.Core.Edge(s, t, false);
+                            e.Tag = tks[5];
                             e.Name = tks[4];
-                            oEdges.Add(e);
+                            oEdges.Add(e);                            
                         }
                     }
                 }
