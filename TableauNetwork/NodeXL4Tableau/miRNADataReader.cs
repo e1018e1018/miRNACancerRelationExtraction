@@ -1,4 +1,5 @@
-﻿using Microsoft.NodeXL.ExcelTemplatePlugIns;
+﻿//using IASL.BioTextMining.NamedEntityIdentification.Dictionary.MeSH;
+using Microsoft.NodeXL.ExcelTemplatePlugIns;
 using Smrf.NodeXL.Core;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace NodeXL4Tableau
 {
     public class MiRNADataReader : IGraphDataProvider2 
     {
+        public const string SENTENCE = "SENT";
+        public const string MeSH = "MeSH";
         protected string output;
         protected List<Edge> edges = new List<Edge>();
         protected List<Node> nodes = new List<Node>();
@@ -83,7 +86,7 @@ namespace NodeXL4Tableau
                     for (int i = 0; i < miRNAs.Length; i++)
                     {
                         Vertex s = new Vertex();
-                        s.Name = miRNAs[i].ToLower();
+                        s.Name = miRNAs[i].ToLower();                                                    
                         if (!vertexes.ContainsKey(s.Name))
                         {
                             vertexes.Add(s.Name, s);
@@ -98,17 +101,21 @@ namespace NodeXL4Tableau
                         {
                             Vertex t = new Vertex();
                             t.Name = diseases[j].ToLower();
-                            if (!vertexes.ContainsKey(t.Name))
+                            t.SetValue(MeSH, tks[7]);
+                            //MeSHDictionaryTagger mesh = MeSHDictionaryTagger.GetInstance(@"D:\Resources\Models\NCBI\MeSH\desc2014.xml", @"D:\Resources\Models\ThirdParty\TsujiiLab\GENIATagger");
+                            //string name = mesh.GetMeSHTrees(tks[7]).First().ToString();
+                            if (!vertexes.ContainsKey(t.GetValue(MeSH).ToString()))
                             {
-                                vertexes.Add(t.Name, t);
+                                vertexes.Add(t.GetValue(MeSH).ToString(), t);
                                 oVertices.Add(t);
                             }
                             else
                             {
-                                t = vertexes[t.Name];                                
+                                t = vertexes[t.GetValue(MeSH).ToString()];            
                             }
                             Smrf.NodeXL.Core.Edge e = new Smrf.NodeXL.Core.Edge(s, t, false);
                             e.Tag = tks[5];
+                            e.SetValue(SENTENCE, tks[1]);
                             e.Name = tks[4];
                             oEdges.Add(e);                            
                         }
