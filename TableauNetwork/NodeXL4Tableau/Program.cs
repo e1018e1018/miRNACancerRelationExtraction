@@ -13,13 +13,13 @@ namespace NodeXL4Tableau
     {
         static void Main(string[] args)
         {
-            MiRNADataReader reader = new MiRNADataReader(@"..\..\..\..\Data\input.txt");
+            MiRNADataReader reader = new MiRNADataReader(@"C:\Users\e1018\Desktop\專題\miRNACancerRelationExtraction\TableauNetwork\Data\input.txt");
             IGraph g = reader.GetGraph();
-            //CircleLayout cl = new CircleLayout();
+            CircleLayout cl = new CircleLayout();
             //FruchtermanReingoldLayout pl = new FruchtermanReingoldLayout();
-            HarelKorenFastMultiscaleLayout hl = new HarelKorenFastMultiscaleLayout();
+            //HarelKorenFastMultiscaleLayout hl = new HarelKorenFastMultiscaleLayout();
             LayoutContext lc = new LayoutContext(new Rectangle(0, 0, 1600, 900));
-            hl.LayOutGraph(g, lc);
+            cl.LayOutGraph(g, lc);
             using (StreamWriter sw = new StreamWriter("tableau.txt"))
             {
                 sw.Write("ID\tRelation\tRelType\tNE\tX\tY\tY'\tNEType\tMeSH\tSent\n");
