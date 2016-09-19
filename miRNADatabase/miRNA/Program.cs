@@ -23,7 +23,7 @@ namespace miRNA
                 //
                 con.Open();
                 XmlDocument miRNA = new XmlDocument();
-                miRNA.Load(@"C:\Users\e1018\Desktop\專題\miRNA-Test-Corpus.xml");
+                miRNA.Load(@"C:\Users\e1018\Desktop\專題\miRNA-Train-Corpus.xml");
                 //for (int i = 0; i < doc.SelectNodes("corpus//document").Count; i++)
                 //{
                 //    XmlNode mode = doc.SelectNodes("corpus//document")[i];
@@ -57,7 +57,7 @@ namespace miRNA
                         int title = Convert.ToInt32(id.Substring(id.Length - 1));
                         int istitle = 0;
                         istitle = (title == 0) ? 1 : 0;
-                        SqlCommand s_command = new SqlCommand("INSERT INTO SENTENCE (ART_ID,IS_TITLE,TEXT) VALUES ('" + fk + "','" + istitle + "','" + text.Replace("'", "''") + "')", con);
+                        SqlCommand s_command = new SqlCommand("INSERT INTO SENTENCE (ART_ID,IS_TITLE,TEXT) VALUES ('" + fk + "','" + istitle + "','" + Escape(text) + "')", con);
                         s_command.ExecuteNonQuery();
                         s_command.CommandText = "select scope_identity()";
                         string s_fk = null;
@@ -87,7 +87,7 @@ namespace miRNA
                                 }
                             }
                             string[] sArray = charOffset.Split('-');
-                            e_command = new SqlCommand("INSERT INTO ENTITY (ANN_ID, TEXT,FIRST_LETTER_NUM,LAST_LETTER_NUM) VALUES ('" + fk_aid + "','" + entext + "','" + sArray[0] + "','" + sArray[1] + "')", con);
+                            e_command = new SqlCommand("INSERT INTO ENTITY (ANN_ID, TEXT,FIRST_LETTER_NUM,LAST_LETTER_NUM) VALUES ('" + fk_aid + "','" + Escape(entext) + "','" + sArray[0] + "','" + sArray[1] + "')", con);
                             e_command.ExecuteNonQuery();
                             string eid = entity.Attributes["id"].Value;
                             entityMap.Add(eid, fk_aid);
@@ -100,7 +100,32 @@ namespace miRNA
                             string e2 = pair.Attributes["e2"].Value;
                             string fk_e1 = entityMap[e1];
                             string fk_e2 = entityMap[e2];
-                            //string inter = pair.Attributes["interatcion"].Value;
+                            string inter = pair.Attributes["interaction"].Value;
+                            string p_type = pair.Attributes["type"].Value;
+                            if (inter == "True")
+                            {
+                                inter = "1";
+                            }
+                            else
+                            {
+                                inter = "0";
+                            }
+                            SqlCommand pa_command = new SqlCommand("INSERT INTO ANNOTATION (SENT_ID,ART_ID, TYPE) VALUES ('" + s_fk + "','" + fk + "','" + p_type + "')", con);
+                            pa_command.ExecuteNonQuery();
+                            pa_command.CommandText = "select scope_identity()";
+                            string fk_paid = null;
+                            using (SqlDataReader reader = pa_command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    fk_paid = reader[0].ToString();
+                                }
+                            }
+                            SqlCommand p_command = new SqlCommand("INSERT INTO PAIR(ANN_ID,E1,E2,INTERACTION) VALUES ('" + fk_paid + "','" + fk_e1 + "','" + fk_e2 + "','" + inter + "')", con);
+                            p_command.ExecuteNonQuery();
+                            p_command.CommandText = "select scope_identity()";
+                            string pid = pair.Attributes["id"].Value;
+                            entityMap.Add(pid, fk_paid);
                             //string p_type = pair.Attributes["type"].Value;
                             //SqlCommand p_command = new SqlCommand("INSERT INTO PAIR(E1,E2,INTERACTION) VALUES ('" + e1 + "','" + e2 + "','" + inter + "')", con);
                             //p_command.ExecuteNonQuery();
@@ -116,6 +141,11 @@ namespace miRNA
                     }
                 }
             }
+        }
+
+        private static string Escape(string text)
+        {
+            return text.Replace("'", "''");
         }
     }
 }
