@@ -17,11 +17,27 @@ namespace miRNA
         static void Main(string[] args)
         {
             using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-UK96O0N;Initial Catalog=miRNA_final;Integrated Security=True"))
+                using(StreamWriter sw=new StreamWriter("log.txt"))
             {
                 //
                 // Open the SqlConnection.
                 //
                 con.Open();
+                //XmlDocument mesh = new XmlDocument();
+                //mesh.Load(@"C:\Users\e1018\Desktop\專題\desc2017.xml");
+                //foreach(XmlNode mesh_id in mesh.SelectNodes("DescriptorRecordSet//DescriptorRecord"))
+                //{
+                //    string meshID = mesh_id["DescriptorUI"].InnerText;
+                //    XmlNode meshnode = mesh_id.SelectSingleNode("DescriptorName");
+                //        string meshdata = meshnode["String"].InnerText;
+                //        SqlCommand mid_command = new SqlCommand("INSERT INTO MESH_HEADING (MESH_ID,MESH_TERM) VALUES ('" + meshID + "','" + meshdata.Replace("'", "''") + "')", con);
+                //            mid_command.ExecuteNonQuery();
+                //            mid_command.CommandText = "select scope_identity()";
+                //        Console.WriteLine( meshID +"   "+ meshdata.Replace("'", "''"));
+
+                //}
+
+
                 XmlDocument miRNA = new XmlDocument();
                 miRNA.Load(@"C:\Users\e1018\Desktop\專題\miRNA-Train-Corpus.xml");
                 //for (int i = 0; i < doc.SelectNodes("corpus//document").Count; i++)
@@ -36,11 +52,23 @@ namespace miRNA
                     //
                     // The following code uses an SqlCommand based on the SqlConnection.
                     //
-                    SqlCommand d_command_0 = new SqlCommand("INSERT INTO ARTICLE (ART_PMID, ART_JOURNAL,ART_ISSN) VALUES ('" + pmid + "','" + a.JournalName.Replace("'", "''") + "','" + a.ISSN + "')", con);
+                    DateTime dt;
+                    try
+                    {
+                        dt = Convert.ToDateTime(a.PublicationDate);
+                    }
+                    catch
+                    {
+                        //
+                        sw.WriteLine(pmid);
+                        continue;
+                    }
+                    SqlCommand d_command_0 = new SqlCommand("INSERT INTO ARTICLE (ART_PMID, ART_JOURNAL, ART_ISSN,PUB_DATE) VALUES ('" + pmid + "','" + a.JournalName.Replace("'", "''") + "','" + a.ISSN + "','" + dt.ToString("yyyyMMdd") + "')", con);
                     //SqlCommand d_command_1 = new SqlCommand("INSERT INTO ARTICLE (ART_JOURNAL) VALUES ('" + + "')", con);
                     //SqlCommand d_command_2 = new SqlCommand("INSERT INTO ARTICLE (ART_ISSN) VALUES ('" + pmid + "')", con);
                     d_command_0.ExecuteNonQuery();
                     d_command_0.CommandText = "select scope_identity()";
+                    Console.WriteLine(pmid + "   " + a.JournalName.Replace("'", "''") + "   " + a.ISSN + "   " + dt.ToString("yyyyMMdd"));
                     string fk = null;
                     using (SqlDataReader reader = d_command_0.ExecuteReader())
                     {
@@ -48,6 +76,34 @@ namespace miRNA
                         {
                             fk = reader[0].ToString();
                         }
+                    }
+
+
+                    int MeshCounts = a.MeSHTerms.Count;
+                    string fk_mesh = null;
+                    for (int C = 0; C < MeshCounts; C++)
+                    {
+                        string[] mesh_h = a.MeSHTerms[C].Split('|');
+                        SqlCommand m_command = new SqlCommand("SELECT MH_ID FROM MESH_HEADING WHERE MESH_ID ='" + mesh_h[1] + "'", con);
+                        //m_command.ExecuteNonQuery();
+
+                        SqlDataReader reader = m_command.ExecuteReader();
+                        try
+                        {
+                            while (reader.Read())
+                            {
+                                fk_mesh = reader[0].ToString();
+                                //string temp = reader[0].ToString() + "," + reader[1].ToString();
+                                //listBox1.Items.Add(temp);
+                            }
+                        }
+                        finally
+                        {
+                            reader.Close();
+                        }
+                        SqlCommand meta_command = new SqlCommand("INSERT INTO METAINFO (MH_ID,ART_ID) VALUES ('" + fk_mesh + "','" + fk + "')", con);
+                        meta_command.ExecuteNonQuery();
+                        meta_command.CommandText = "select scope_identity()";
                     }
 
                     foreach (XmlNode sent in doc.SelectNodes("sentence"))
@@ -60,6 +116,7 @@ namespace miRNA
                         SqlCommand s_command = new SqlCommand("INSERT INTO SENTENCE (ART_ID,IS_TITLE,TEXT) VALUES ('" + fk + "','" + istitle + "','" + Escape(text) + "')", con);
                         s_command.ExecuteNonQuery();
                         s_command.CommandText = "select scope_identity()";
+                        Console.WriteLine(fk + "   " + istitle + "   " + Escape(text));
                         string s_fk = null;
                         using (SqlDataReader reader = s_command.ExecuteReader())
                         {
@@ -89,6 +146,7 @@ namespace miRNA
                             string[] sArray = charOffset.Split('-');
                             e_command = new SqlCommand("INSERT INTO ENTITY (ANN_ID, TEXT,FIRST_LETTER_NUM,LAST_LETTER_NUM) VALUES ('" + fk_aid + "','" + Escape(entext) + "','" + sArray[0] + "','" + sArray[1] + "')", con);
                             e_command.ExecuteNonQuery();
+                            Console.WriteLine(fk_aid + "   " + Escape(entext) + "   " + sArray[0] + "   " + sArray[1]);
                             string eid = entity.Attributes["id"].Value;
                             entityMap.Add(eid, fk_aid);
                         }
@@ -113,6 +171,7 @@ namespace miRNA
                             SqlCommand pa_command = new SqlCommand("INSERT INTO ANNOTATION (SENT_ID,ART_ID, TYPE) VALUES ('" + s_fk + "','" + fk + "','" + p_type + "')", con);
                             pa_command.ExecuteNonQuery();
                             pa_command.CommandText = "select scope_identity()";
+                            Console.WriteLine(s_fk + "   " + fk + "   " + p_type);
                             string fk_paid = null;
                             using (SqlDataReader reader = pa_command.ExecuteReader())
                             {
@@ -124,6 +183,7 @@ namespace miRNA
                             SqlCommand p_command = new SqlCommand("INSERT INTO PAIR(ANN_ID,E1,E2,INTERACTION) VALUES ('" + fk_paid + "','" + fk_e1 + "','" + fk_e2 + "','" + inter + "')", con);
                             p_command.ExecuteNonQuery();
                             p_command.CommandText = "select scope_identity()";
+                            Console.WriteLine(fk_paid + "   " + fk_e1 + "   " + fk_e2 + "   " + inter);
                             string pid = pair.Attributes["id"].Value;
                             entityMap.Add(pid, fk_paid);
                             //string p_type = pair.Attributes["type"].Value;
@@ -137,6 +197,7 @@ namespace miRNA
                             //    adapter.Fill(annTable);
                             //    adapter.Update(annTable);
                             //}
+
                         }
                     }
                 }
