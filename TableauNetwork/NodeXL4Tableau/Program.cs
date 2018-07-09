@@ -13,7 +13,7 @@ namespace NodeXL4Tableau
     {
         static void Main(string[] args)
         {
-            MiRNADataReader reader = new MiRNADataReader(@"C:\Users\e1018\Desktop\專題\miRNACancerRelationExtraction\TableauNetwork\Data\input.txt");
+            using (SqlConnection con = new SqlConnection("Data Source=DESKTOP-UK96O0N;Initial Catalog=miRNA_final;Integrated Security=True"))
             IGraph g = reader.GetGraph();
             CircleLayout cl = new CircleLayout();
             //FruchtermanReingoldLayout pl = new FruchtermanReingoldLayout();
